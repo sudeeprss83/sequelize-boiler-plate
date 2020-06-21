@@ -1,102 +1,37 @@
 const { Sequelize } = require("sequelize");
 const express = require("express");
 
+const port = process.env.PORT || 3000;
+
+//Database Connection
+const sequelize = require("./Database/sequelize");
+
+//Database Models
+const User = require("./models/User");
+const Post = require("./models/Post");
+
 //creating express app
 const app = express();
 app.use(express.json());
 
-//Sequelize Code......................................
-
-const sequelize = new Sequelize("ForgotPassword", "root", "User(123)", {
-  host: "localhost",
-  dialect: "mysql",
-});
-
-const User = sequelize.define(
-  "User",
-  {
-    id: {
-      type: Sequelize.UUID,
-      primaryKey: true,
-      allowNull: false,
-      defaultValue: Sequelize.UUIDV4,
-    },
-    username: {
-      type: Sequelize.STRING,
-      allowNull: false,
-    },
-    email: {
-      type: Sequelize.TEXT,
-      allowNull: false,
-    },
-  },
-  {
-    timestamps: false,
-  }
-);
-
-const Post = sequelize.define(
-  "Post",
-  {
-    title: {
-      type: Sequelize.STRING,
-      allowNull: false,
-    },
-    description: {
-      type: Sequelize.TEXT,
-      allowNull: false,
-    },
-  },
-  {
-    timestamps: false,
-  }
-);
-
-
-// sequelize
-//   .sync()
-//   .then(() => {
-//     console.log("models created");
-//   })
-//   .catch((err) => console.log(err));
-
-
-sequelize.sync({ force: true })
+sequelize
+  .sync()
   .then(() => {
-    return User.create({
-      username: "sudip",
-      email: "sdip.ssr38@gmail.com",
+    console.log("Database Synced Successfully");
+    app.listen(port, () => {
+      console.log(`connected to port ${port}...`);
     });
   })
-  .then((user) => console.log(user.dataValues))
-  .then(()=>{
-    return Post.create({
-      UserId:1,
-      title: "sudip is a good boy",
-      description: "This is a description",
-    });
-  })
-  .catch(err=>console.log("error occured", err))
-  .catch((err) => console.log("error occured", err))
-  .catch((err) => console.log("Unable to create the user", err));
-
-// Post.sync({ force: true })
-//   .then(() => {
-//     return Post.create({
-//       title: "sudip is a good boy",
-//       description: "This is a description",
-//     });
-//   })
-//   .catch((err) => console.log("Unable to create the user", err));
-//....................................................
+  .catch((err) => console.log(err));
 
 //Fetching the home page
-app.get("/", (req, res) => {
-  res.send("home");
+app.post("/register", (req, res) => {
+  User.create({
+    username: req.body.username,
+    email: req.body.email,
+  })
+    .then((user) => res.json(user))
+    .catch((err) => console.log(err));
 });
 
-//connecting to the server port
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`connected to port ${port}...`);
-});
+
