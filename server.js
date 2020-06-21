@@ -1,7 +1,10 @@
 const { Sequelize } = require("sequelize");
 const express = require("express");
+const dotenv=require("dotenv");
 
-const port = process.env.PORT || 3000;
+
+dotenv.config();
+const port = process.env.PORT ||3000;
 
 //Database Connection
 const sequelize = require("./Database/sequelize");
@@ -13,6 +16,8 @@ const Post = require("./models/Post");
 //creating express app
 const app = express();
 app.use(express.json());
+
+
 
 sequelize
   .sync()
